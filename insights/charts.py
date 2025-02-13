@@ -38,7 +38,7 @@ def plot_top_selling_products(df):
         return None
     
     plt.figure(figsize=(8, 5))
-    sns.barplot(x="total_quantity_sold", y="product_name", data=df.sort_values("total_quantity_sold", ascending=False))
+    sns.barplot(x="total_quantity_sold", y="product_name", data=df.sort_values("total_sold", ascending=False))
     plt.xlabel("Total Sold")
     plt.ylabel("Product Name")
     plt.title("Top Selling Products")
