@@ -48,6 +48,7 @@ def format_dataframe(df):
 def fetch_insights():
     insights = f"📊 *Auto-Generated Data Insights* 📊\n📅 {datetime.now().strftime('%Y-%m-%d %H:%M')} \n\n"
     images = []
+    dataframes = {}
 
     query_titles = {
         "Total Sales by Payment Method": (get_total_sales_by_payment_method(), plot_sales_by_payment),
@@ -62,44 +63,57 @@ def fetch_insights():
     for title, (query, chart_function) in query_titles.items():
         df = pd.read_sql(query, conn)
         if not df.empty:
-            formatted_df = format_dataframe(df)  # Apply number formatting
+            formatted_df = format_dataframe(df)
             insights += f"*{title}*:\n"
-            insights += f"```\n{formatted_df.to_string(index=False)}\n```\n\n"  # Convert formatted DataFrame to string
-            images.append(chart_function(df))  # ✅ Generate and store the chart
-    
-    return insights, images  # ✅ Return insights & images
+            insights += f"```\n{formatted_df.to_string(index=False)}\n```\n\n"
+            images.append(chart_function(df))
+            dataframes[title] = df  # Store DataFrame for CSV upload
 
+    return insights, images, dataframes
 
-# Function to send insights and images to Slack
-def send_to_slack(insights, images):
+# Send insights, images, and CSV files to Slack
+def send_to_slack(insights, images, dataframes):
     SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK')
+    SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
+    SLACK_CHANNEL = "#insights"
+
+    if not SLACK_WEBHOOK_URL or not SLACK_BOT_TOKEN:
+        print("Error: SLACK_WEBHOOK or SLACK_BOT_TOKEN is missing.")
+        return
     
-    if SLACK_WEBHOOK_URL:
-        try:
-            # Send text insights
-            response = requests.post(SLACK_WEBHOOK_URL, json={"text": insights})
-            response.raise_for_status()
-            
-            # Send charts as images
-            for i, img in enumerate(images):
-                requests.post(
-                    SLACK_WEBHOOK_URL,
-                    files={"file": (f"chart_{i}.png", img, "image/png")},
-                    data={"channels": "#insights"}
-                )
+    try:
+        # Send insights as a Slack message
+        response = requests.post(SLACK_WEBHOOK_URL, json={"text": insights})
+        response.raise_for_status()
 
-            print("Message & charts sent to Slack!")
+        headers = {"Authorization": f"Bearer {SLACK_BOT_TOKEN}"}
 
-        except requests.exceptions.RequestException as e:
-            print(f"Error sending message to Slack: {e}")
+        # Upload images
+        for i, img in enumerate(images):
+            files = {"file": (f"chart_{i}.png", img, "image/png")}
+            data = {"channels": SLACK_CHANNEL, "title": f"Chart {i}"}
+            img_response = requests.post("https://slack.com/api/files.upload", headers=headers, data=data, files=files)
+            if not img_response.json().get("ok"):
+                print(f"⚠️ Failed to upload image {i}: {img_response.json()}")
 
-    else:
-        print("SLACK_WEBHOOK_URL is not set properly.")
+        # Upload CSV files
+        for title, df in dataframes.items():
+            csv_buffer = BytesIO()
+            df.to_csv(csv_buffer, index=False)
+            csv_buffer.seek(0)
+            files = {"file": (f"{title.replace(' ', '_')}.csv", csv_buffer, "text/csv")}
+            data = {"channels": SLACK_CHANNEL, "title": f"Data - {title}"}
+            csv_response = requests.post("https://slack.com/api/files.upload", headers=headers, data=data, files=files)
+            if not csv_response.json().get("ok"):
+                print(f"⚠️ Failed to upload CSV: {csv_response.json()}")
+
+        print("✅ Insights, charts, and data files sent to Slack!")
+
+    except requests.exceptions.RequestException as e:
+        print(f"⚠️ Error sending message to Slack: {e}")
 
 # Main function
 if __name__ == "__main__":
-    insights, images = fetch_insights()
-    send_to_slack(insights, images)
-    
-    # Close the database connection
+    insights, images, dataframes = fetch_insights()
+    send_to_slack(insights, images, dataframes)
     conn.close()
