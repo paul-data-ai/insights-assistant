@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from datetime import datetime
 import requests
@@ -18,7 +17,7 @@ from insights.queries import (  # Import the queries
     get_highest_value_sales
 )
 
-
+conn = get_engine()
 
 # Function to fetch and display insights
 def fetch_insights():

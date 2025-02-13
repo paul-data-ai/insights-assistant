@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+import os
 
 # Set up database connection using SQLAlchemy
 DB_HOST = os.getenv('DB_HOST')
