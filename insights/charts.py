@@ -18,7 +18,7 @@ def plot_sales_by_payment(df):
 # Function to generate a bar chart for top-selling products
 def plot_top_selling_products(df):
     plt.figure(figsize=(8, 5))
-    sns.barplot(x="total_quantity_sold", y="product_name", data=df.sort_values("total_sold", ascending=False))
+    sns.barplot(x="total_quantity_sold", y="product_name", data=df.sort_values("total_quantity_sold", ascending=False))
     plt.xlabel("Total Sold")
     plt.ylabel("Product Name")
     plt.title("Top Selling Products")
