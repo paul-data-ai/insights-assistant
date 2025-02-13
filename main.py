@@ -35,6 +35,16 @@ from insights.charts import (  # Import all chart functions
 conn = get_engine().connect()
 
 # Function to fetch and display insights
+def format_number(value):
+    """Formats numbers with commas and two decimal places if they are floats/integers."""
+    if isinstance(value, (int, float)):
+        return f"{value:,.2f}"  # Adds commas and keeps two decimal places
+    return value  # Return as is if it's not a number
+
+def format_dataframe(df):
+    """Applies formatting to all numerical values in a DataFrame."""
+    return df.applymap(format_number)
+
 def fetch_insights():
     insights = f"📊 *Auto-Generated Data Insights* 📊\n📅 {datetime.now().strftime('%Y-%m-%d %H:%M')} \n\n"
     images = []
@@ -45,21 +55,20 @@ def fetch_insights():
         "Sales Performance by Region": (get_sales_performance_by_region(), plot_sales_performance_by_region),
         "Customer Type Analysis": (get_customer_type_analysis(), plot_customer_type_analysis),
         "Sales Channel Comparison": (get_sales_channel_comparison(), plot_sales_channel_comparison),
-        # "Average Sale Price": (get_average_sale_price(), plot_average_sale_price),
         "Sales Trend Over Time (Daily)": (get_sales_trend_over_time(), plot_sales_trend_over_time),
         "Sales Performance by Salesperson": (get_sales_performance_by_salesperson(), plot_sales_performance_by_salesperson),
-        # "Refund Status Analysis": (get_refund_status_analysis(), plot_refund_status_analysis),
-        # "Highest Value Sales": (get_highest_value_sales(), plot_highest_value_sales)
     }
 
     for title, (query, chart_function) in query_titles.items():
         df = pd.read_sql(query, conn)
         if not df.empty:
+            formatted_df = format_dataframe(df)  # Apply number formatting
             insights += f"*{title}*:\n"
-            insights += f"```\n{df.to_string(index=False)}\n```\n\n"
+            insights += f"```\n{formatted_df.to_string(index=False)}\n```\n\n"  # Convert formatted DataFrame to string
             images.append(chart_function(df))  # ✅ Generate and store the chart
     
     return insights, images  # ✅ Return insights & images
+
 
 # Function to send insights and images to Slack
 def send_to_slack(insights, images):
