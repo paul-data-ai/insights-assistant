@@ -5,25 +5,25 @@ import requests
 import json
 from datetime import datetime
 
-# # Get secrets from environment variables 
-# DB_HOST = os.getenv("DB_HOST")
-# DB_USER = os.getenv("DB_USER")
-# DB_PASS = os.getenv("DB_PASS")
-# DB_NAME = os.getenv("DB_NAME")
-# DB_PORT = os.getenv("DB_PORT")  # Default PostgreSQL port
-# SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK")
+# Get secrets from environment variables 
+DB_HOST = os.getenv("DB_HOST")
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_NAME = os.getenv("DB_NAME")
+DB_PORT = os.getenv("DB_PORT")  # Default PostgreSQL port
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK")
 
-# Load config
-with open("config.json", "r") as f:
-    config = json.load(f)
+# # Load config
+# with open("config.json", "r") as f:
+#     config = json.load(f)
 
 # Get secrets from environment variables
-DB_HOST = config["db_host"]
-DB_USER = config["db_user"]
-DB_PASS = config["db_pass"]
-DB_NAME = config["db_name"]
-DB_PORT = config["db_port"]  # Default PostgreSQL port
-SLACK_WEBHOOK_URL = config["slack_webhook"]
+# DB_HOST = config["db_host"]
+# DB_USER = config["db_user"]
+# DB_PASS = config["db_pass"]
+# DB_NAME = config["db_name"]
+# DB_PORT = config["db_port"]  # Default PostgreSQL port
+# SLACK_WEBHOOK_URL = config["slack_webhook"]
 
 connection_string = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
