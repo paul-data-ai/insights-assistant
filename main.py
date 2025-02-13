@@ -77,9 +77,13 @@ def send_to_slack(insights, images, dataframes):
     SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
     SLACK_CHANNEL = "#insights"
 
+    if not SLACK_WEBHOOK_URL:
+        print("Error: SLACK_WEBHOOK_URL is missing.")
+    if not SLACK_BOT_TOKEN:
+        print("Error: SLACK_BOT_TOKEN is missing.")
     if not SLACK_WEBHOOK_URL or not SLACK_BOT_TOKEN:
-        print("Error: SLACK_WEBHOOK or SLACK_BOT_TOKEN is missing.")
         return
+
     
     try:
         # Send insights as a Slack message
