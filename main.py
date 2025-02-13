@@ -73,21 +73,21 @@ def fetch_insights():
 
 
 SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK')
-SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
+SLACK_BOT_TOKEN_ = os.getenv('SLACK_BOT_TOKEN')
 
 
 # Send insights, images, and CSV files to Slack
 def send_to_slack(insights, images, dataframes):
     print(f"SLACK_WEBHOOK_URL: {'SET' if SLACK_WEBHOOK_URL else 'MISSING'}")
-    print(f"SLACK_BOT_TOKEN: {'SET' if SLACK_BOT_TOKEN else 'MISSING'}")
+    print(f"SLACK_BOT_TOKEN: {'SET' if SLACK_BOT_TOKEN_ else 'MISSING'}")
 
     SLACK_CHANNEL = "#insights"
 
     if not SLACK_WEBHOOK_URL:
         print("Error: SLACK_WEBHOOK_URL is missing.")
-    if not SLACK_BOT_TOKEN:
+    if not SLACK_BOT_TOKEN_:
         print("Error: SLACK_BOT_TOKEN is missing.")
-    if not SLACK_WEBHOOK_URL or not SLACK_BOT_TOKEN:
+    if not SLACK_WEBHOOK_URL or not SLACK_BOT_TOKEN_:
         return
 
     
@@ -96,7 +96,7 @@ def send_to_slack(insights, images, dataframes):
         response = requests.post(SLACK_WEBHOOK_URL, json={"text": insights})
         response.raise_for_status()
 
-        headers = {"Authorization": f"Bearer {SLACK_BOT_TOKEN}"}
+        headers = {"Authorization": f"Bearer {SLACK_BOT_TOKEN_}"}
 
         # Upload images
         for i, img in enumerate(images):
