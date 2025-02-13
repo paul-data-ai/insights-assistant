@@ -78,6 +78,7 @@ SLACK_BOT_TOKEN_ = os.getenv('SLACK_BOT_TOKEN')
 
 # Send insights, images, and CSV files to Slack
 def send_to_slack(insights, images, dataframes):
+    print(f"test-secret: {'test-secret-shown' if os.getenv('test') else 'MISSING: test-not-shown '}")
     print(f"SLACK_WEBHOOK_URL: {'SET' if SLACK_WEBHOOK_URL else 'MISSING'}")
     print(f"SLACK_BOT_TOKEN: {'SET' if SLACK_BOT_TOKEN_ else 'MISSING'}")
 
