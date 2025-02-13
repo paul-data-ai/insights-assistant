@@ -10,11 +10,11 @@ from insights.queries import (  # Import the queries
     get_sales_performance_by_region,
     get_customer_type_analysis,
     get_sales_channel_comparison,
-    get_average_sale_price,
+    # get_average_sale_price,
     get_sales_trend_over_time,
     get_sales_performance_by_salesperson,
-    get_refund_status_analysis,
-    get_highest_value_sales
+    # get_refund_status_analysis,
+    # get_highest_value_sales
 )
 
 from insights.charts import (  # Import all chart functions
@@ -23,11 +23,11 @@ from insights.charts import (  # Import all chart functions
     plot_sales_performance_by_region,
     plot_customer_type_analysis,
     plot_sales_channel_comparison,
-    plot_average_sale_price,
+    # plot_average_sale_price,
     plot_sales_trend_over_time,
     plot_sales_performance_by_salesperson,
-    plot_refund_status_analysis,
-    plot_highest_value_sales
+    # plot_refund_status_analysis,
+    # plot_highest_value_sales
 )
 
 
@@ -45,11 +45,11 @@ def fetch_insights():
         "Sales Performance by Region": (get_sales_performance_by_region(), plot_sales_performance_by_region),
         "Customer Type Analysis": (get_customer_type_analysis(), plot_customer_type_analysis),
         "Sales Channel Comparison": (get_sales_channel_comparison(), plot_sales_channel_comparison),
-        "Average Sale Price": (get_average_sale_price(), plot_average_sale_price),
+        # "Average Sale Price": (get_average_sale_price(), plot_average_sale_price),
         "Sales Trend Over Time (Daily)": (get_sales_trend_over_time(), plot_sales_trend_over_time),
         "Sales Performance by Salesperson": (get_sales_performance_by_salesperson(), plot_sales_performance_by_salesperson),
-        "Refund Status Analysis": (get_refund_status_analysis(), plot_refund_status_analysis),
-        "Highest Value Sales": (get_highest_value_sales(), plot_highest_value_sales)
+        # "Refund Status Analysis": (get_refund_status_analysis(), plot_refund_status_analysis),
+        # "Highest Value Sales": (get_highest_value_sales(), plot_highest_value_sales)
     }
 
     for title, (query, chart_function) in query_titles.items():

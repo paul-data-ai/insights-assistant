@@ -4,3 +4,4 @@ faker
 pandas
 sqlalchemy 
 seaborn
+matplotlib
