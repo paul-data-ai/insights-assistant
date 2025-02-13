@@ -3,3 +3,4 @@ psycopg2
 faker
 pandas
 sqlalchemy 
+seaborn
