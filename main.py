@@ -4,7 +4,6 @@ import requests
 import os
 
 from database.conn import get_engine
-
 from insights.queries import (  # Import the queries
     get_total_sales_by_payment_method,
     get_top_selling_products,
@@ -18,13 +17,14 @@ from insights.queries import (  # Import the queries
     get_highest_value_sales
 )
 
-conn = get_engine()
+# Get database connection
+conn = get_engine().connect()
 
 # Function to fetch and display insights
 def fetch_insights():
     insights = f"📊 *Auto-Generated Data Insights* 📊\n📅 {datetime.now().strftime('%Y-%m-%d %H:%M')} \n\n"
     
-    # Create a dictionary for each query and its title
+    # Define query titles with their respective SQL queries
     query_titles = {
         "Total Sales by Payment Method": get_total_sales_by_payment_method(),
         "Top Selling Products": get_top_selling_products(),
@@ -38,33 +38,34 @@ def fetch_insights():
         "Highest Value Sales": get_highest_value_sales()
     }
     
-    # Process each query and collect the insights with proper titles
+    # Execute each query and append results
     for title, query in query_titles.items():
-        df = pd.read_sql(query, conn)
+        df = pd.read_sql(query, conn)  # Read query result
         if not df.empty:
-            insights += f"*{title}*:\n"  # Add the title for each insight
-            insights += f"```\n{df.to_string(index=False)}\n```\n\n"  # Display the result in a readable format
-        return insights
+            insights += f"*{title}*:\n"  # Add section title
+            insights += f"```\n{df.to_string(index=False)}\n```\n\n"  # Format output
+
+    return insights  # Ensure all insights are processed
 
 # Send insights to Slack
 def send_to_slack(insights):
     SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK')
-    if SLACK_WEBHOOK_URL:
-        try:
-            response = requests.post(SLACK_WEBHOOK_URL, json={"text": insights})
-            response.raise_for_status()  # Raises error for bad responses (4xx, 5xx)
-            print("Message sent to Slack!")
-        except requests.exceptions.RequestException as e:
-            print(f"Error sending message to Slack: {e}")
-    else:
+    
+    if not SLACK_WEBHOOK_URL:
         print("SLACK_WEBHOOK_URL is not set properly.")
+        return
+    
+    try:
+        response = requests.post(SLACK_WEBHOOK_URL, json={"text": insights})
+        response.raise_for_status()  # Handle errors properly
+        print("Message sent to Slack!")
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending message to Slack: {e}")
 
 # Main function
 if __name__ == "__main__":
     insights = fetch_insights()
     send_to_slack(insights)
-
-# Close DB connection
-conn.close()
-
-
+    
+    # Close the database connection
+    conn.close()
