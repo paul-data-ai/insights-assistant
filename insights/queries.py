@@ -34,7 +34,8 @@ def get_sales_performance_by_region():
         SUM(price * quantity) AS total_revenue
     FROM sales
     GROUP BY region
-    ORDER BY total_revenue DESC;
+    ORDER BY total_revenue DESC
+    LIMIT 10;
     """
 
 # 4. Customer Type Analysis
