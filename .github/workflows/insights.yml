@@ -11,6 +11,8 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+    strategy:
+      max_attempts: 3  # Retries the entire job up to 3 times if it fails
 
     steps:
       - name: Checkout repository
@@ -24,6 +26,16 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+
+      - name: Retry Database Connection (5 attempts)
+        run: |
+          for i in {1..5}; do
+            echo "Attempt $i to connect to the database..."
+            PGPASSWORD=${{ secrets.DB_PASS }} psql -h ${{ secrets.DB_HOST }} -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -p ${{ secrets.DB_PORT }} -c "\dt" && break
+            echo "Database connection failed. Retrying in 10 seconds..."
+            sleep 10
+          done
+        shell: bash
 
       - name: Run insights script
         env:
