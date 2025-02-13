@@ -20,7 +20,7 @@ conn = psycopg2.connect(
     password=DB_PASS,
     dbname=DB_NAME,
     port=DB_PORT,
-    pool_mode="transaction"
+    # pool_mode="transaction"
 )
 
 # Get all tables in the public schema
