@@ -2,6 +2,15 @@ import pandas as pd
 from datetime import datetime
 import requests
 import os
+from io import BytesIO
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
+
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from database.conn import get_engine
 from insights.queries import (  # Import the queries
@@ -30,6 +39,7 @@ from insights.charts import (  # Import all chart functions
     # plot_highest_value_sales
 )
 
+from llm.llm import generate_actionables
 
 # Get database connection
 conn = get_engine().connect()
@@ -43,7 +53,8 @@ def format_number(value):
 
 def format_dataframe(df):
     """Applies formatting to all numerical values in a DataFrame."""
-    return df.applymap(format_number)
+    return df.map(format_number)  # Replaces applymap with map
+
 
 def fetch_insights():
     insights = f"📊 *Auto-Generated Data Insights* 📊\n📅 {datetime.now().strftime('%Y-%m-%d %H:%M')} \n\n"
@@ -71,60 +82,22 @@ def fetch_insights():
 
     return insights, images, dataframes
 
-
-SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK')
-SLACK_BOT_TOKEN_ = os.getenv('SLACK_BOT_TOKEN')
+# Load environment variables
+SLACK_CHANNEL = "#insights"  
+client = WebClient(token=os.getenv('SLACK_BOT_TOKEN'))
 
 
 # Send insights, images, and CSV files to Slack
-def send_to_slack(insights, images, dataframes):
-    print(f"SLACK_WEBHOOK_URL: {'SET' if SLACK_WEBHOOK_URL else 'MISSING'}")
-    print(f"SLACK_BOT_TOKEN: {'SET' if SLACK_BOT_TOKEN_ else 'MISSING'}")
-
-    SLACK_CHANNEL = "#insights"
-
-    if not SLACK_WEBHOOK_URL:
-        print("Error: SLACK_WEBHOOK_URL is missing.")
-    if not SLACK_BOT_TOKEN_:
-        print("Error: SLACK_BOT_TOKEN is missing.")
-    if not SLACK_WEBHOOK_URL or not SLACK_BOT_TOKEN_:
-        return
-
-    
+def send_to_slack(insights):
+    """Sends text-based insights to Slack."""
     try:
-        # Send insights as a Slack message
-        response = requests.post(SLACK_WEBHOOK_URL, json={"text": insights})
-        response.raise_for_status()
-
-        headers = {"Authorization": f"Bearer {SLACK_BOT_TOKEN_}"}
-
-        # Upload images
-        for i, img in enumerate(images):
-            files = {"file": (f"chart_{i}.png", img, "image/png")}
-            data = {"channels": SLACK_CHANNEL, "title": f"Chart {i}"}
-            img_response = requests.post("https://slack.com/api/files.upload", headers=headers, data=data, files=files)
-            if not img_response.json().get("ok"):
-                print(f"⚠️ Failed to upload image {i}: {img_response.json()}")
-
-        # Upload CSV files
-        for title, df in dataframes.items():
-            csv_buffer = BytesIO()
-            df.to_csv(csv_buffer, index=False)
-            csv_buffer.seek(0)
-            files = {"file": (f"{title.replace(' ', '_')}.csv", csv_buffer, "text/csv")}
-            data = {"channels": SLACK_CHANNEL, "title": f"Data - {title}"}
-            csv_response = requests.post("https://slack.com/api/files.upload", headers=headers, data=data, files=files)
-            if not csv_response.json().get("ok"):
-                print(f"⚠️ Failed to upload CSV: {csv_response.json()}")
-
-        print("✅ Insights, charts, and data files sent to Slack!")
-
-    except requests.exceptions.RequestException as e:
-        print(f"⚠️ Error sending message to Slack: {e}")
+        client.chat_postMessage(channel=SLACK_CHANNEL, text=insights)
+        print("✅ Insights sent to Slack!")
+    except SlackApiError as e:
+        print(f"⚠️ Error sending message to Slack: {e.response['error']}")
 
 # Main function
 if __name__ == "__main__":
     insights, images, dataframes = fetch_insights()
-    print(f"test-secret: {'test-secret-shown' if os.getenv('TEST') else 'MISSING: test-not-shown '}")
-    send_to_slack(insights, images, dataframes)
+    send_to_slack(generate_actionables(insights))
     conn.close()

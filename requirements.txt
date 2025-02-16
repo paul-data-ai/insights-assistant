@@ -5,3 +5,6 @@ pandas
 sqlalchemy 
 seaborn
 matplotlib
+python-dotenv
+slack-sdk
+together
