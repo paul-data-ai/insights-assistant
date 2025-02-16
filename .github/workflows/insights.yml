@@ -37,7 +37,7 @@ jobs:
           TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
         run: |
           attempts=0
-          max_attempts=5
+          max_attempts=3
           until python main.py || [ $attempts -ge $max_attempts ]; do
             echo "Attempt $((attempts+1)) failed. Retrying in 10 seconds..."
             attempts=$((attempts+1))
