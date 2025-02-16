@@ -62,7 +62,7 @@ def generate_actionables(insights_data):
     📈 *Stay ahead of the curve!* 🚀  
 
     ### **Guidelines:**  
-    - **Keep it concise** (short, punchy sentences).  
+    - **Keep it concise, and must be mobile-phone friendly** (short, punchy sentences).  
     - **Use whitespace and dividers (`------`)** to improve Slack readability.  
     - **Use emojis sparingly**, only where they enhance clarity.  
     - **Ensure Markdown formatting is valid** for proper Slack rendering.  
