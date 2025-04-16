@@ -83,7 +83,3 @@ Insights Assistant is an AI-powered data analysis tool designed to fetch, analyz
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License.
