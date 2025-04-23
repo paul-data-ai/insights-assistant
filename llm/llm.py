@@ -63,9 +63,26 @@ def generate_actionables(insights_data):
 
     ### **Guidelines:**  
     - **Keep it concise, and must be mobile-phone friendly** (short, punchy sentences).  
+    - **Use bullet points** for clarity and easy scanning
+    - **Use emojis** to enhance readability and engagement.
+    - **Use bold text** for emphasis on key points.
+    - **Use italics** for quotes or important terms.
+    - **Use numbered lists** for sequential steps or priorities.
+    - **Use headings** to separate sections.
+    - **Use short paragraphs** to avoid overwhelming the reader.
+    - **Use clear and simple language** to ensure understanding.
+    - **Use active voice** to make the content more engaging.
+    - **Use consistent formatting** for similar types of information.
+    - **Use tables or charts** for complex data (if applicable).
+    - **Use callouts** for important notes or warnings.
+    - **Use examples** to illustrate points.
+    - **Use quotes** for direct citations or testimonials.
+    - **Use lists** for multiple items or options.
+    - **Use links** to provide additional resources or references.
     - **Use whitespace and dividers (`------`)** to improve Slack readability.  
     - **Use emojis sparingly**, only where they enhance clarity.  
     - **Ensure Markdown formatting is valid** for proper Slack rendering.  
+    - **Ensure that eachbullet point is a cmplete senetece of at most 20 words.**
     """
     
     try:
